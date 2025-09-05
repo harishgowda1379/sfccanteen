@@ -1,0 +1,307 @@
+{% extends 'layout.html' %}
+{% block content %}
+
+<!-- Dashboard Header -->
+<div class="row mb-5">
+    <div class="col-12">
+        <div class="glass-card p-4 text-center animate-fadeIn">
+            <h2 class="gradient-text mb-2">
+                <i class="fas fa-building me-3"></i>
+                Department Management
+            </h2>
+            <p class="text-muted mb-0">Manage department logins and credentials</p>
+        </div>
+    </div>
+</div>
+
+<!-- Statistics Cards -->
+<div class="row g-4 mb-5">
+    <div class="col-lg-4 col-md-6">
+        <div class="stat-card animate-fadeIn delay-1">
+            <div class="d-flex align-items-center justify-content-between">
+                <div>
+                    <div class="stat-number">{{ departments|length }}</div>
+                    <div class="stat-label">Active Departments</div>
+                </div>
+                <div class="opacity-50">
+                    <i class="fas fa-building" style="font-size: 2rem;"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-lg-4 col-md-6">
+        <div class="stat-card animate-fadeIn delay-2">
+            <div class="d-flex align-items-center justify-content-between">
+                <div>
+                    <div class="stat-number">3</div>
+                    <div class="stat-label">System Accounts</div>
+                </div>
+                <div class="opacity-50">
+                    <i class="fas fa-users-cog" style="font-size: 2rem;"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-lg-4 col-md-6">
+        <div class="stat-card animate-fadeIn delay-3">
+            <div class="d-flex align-items-center justify-content-between">
+                <div>
+                    <div class="stat-number">{{ departments|length + 3 }}</div>
+                    <div class="stat-label">Total Users</div>
+                </div>
+                <div class="opacity-50">
+                    <i class="fas fa-users" style="font-size: 2rem;"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Add New Department -->
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="glass-card p-4 animate-fadeIn delay-4">
+            <div class="d-flex flex-wrap align-items-center justify-content-between mb-4">
+                <h5 class="text-gradient mb-0">
+                    <i class="fas fa-plus-circle me-2"></i>
+                    Add New Department
+                </h5>
+            </div>
+            
+            <form method="post" action="{{ url_for('add_department') }}" id="addDepartmentForm">
+                <div class="row g-3">
+                    <div class="col-md-5">
+                        <label class="form-label-modern">
+                            <i class="fas fa-building"></i>
+                            Department Name
+                        </label>
+                        <input type="text" class="form-control-modern" name="department_name" 
+                               required placeholder="Enter department name" id="departmentName">
+                    </div>
+                    <div class="col-md-5">
+                        <label class="form-label-modern">
+                            <i class="fas fa-lock"></i>
+                            Password
+                        </label>
+                        <input type="password" class="form-control-modern" name="password" 
+                               required placeholder="Enter password" id="departmentPassword">
+                    </div>
+                    <div class="col-md-2 d-flex align-items-end">
+                        <button type="submit" class="btn-modern btn-primary-modern w-100">
+                            <i class="fas fa-plus me-2"></i>
+                            Add
+                        </button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Department List -->
+<div class="row">
+    <div class="col-12">
+        <div class="glass-card p-4 animate-fadeIn delay-5">
+            <h4 class="text-gradient mb-4">
+                <i class="fas fa-list me-2"></i>
+                Existing Departments
+            </h4>
+            
+            {% if departments %}
+            <div class="table-responsive">
+                <table class="table-modern table">
+                    <thead>
+                        <tr>
+                            <th><i class="fas fa-building me-2"></i>Department</th>
+                            <th><i class="fas fa-user me-2"></i>Login Username</th>
+                            <th><i class="fas fa-calendar me-2"></i>Created</th>
+                            <th><i class="fas fa-user-shield me-2"></i>Created By</th>
+                            <th><i class="fas fa-cogs me-2"></i>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for dept_id, dept_info in departments.items() %}
+                        <tr class="animate-fadeIn" style="animation-delay: {{ loop.index * 0.1 }}s;">
+                            <td>
+                                <div class="d-flex align-items-center">
+                                    <div class="bg-primary rounded-circle d-flex align-items-center justify-content-center me-3" 
+                                         style="width: 32px; height: 32px; font-size: 0.8rem; color: white;">
+                                        {{ dept_info.department_name[0]|upper if dept_info.department_name else dept_id[0]|upper }}
+                                    </div>
+                                    <strong>{{ dept_info.department_name or dept_id|title }}</strong>
+                                </div>
+                            </td>
+                            <td>
+                                <code class="bg-light p-1 rounded">{{ dept_id }}</code>
+                            </td>
+                            <td>
+                                <small class="text-muted">
+                                    {{ dept_info.created_at if dept_info.created_at else 'N/A' }}
+                                </small>
+                            </td>
+                            <td>
+                                <small class="text-muted">
+                                    {{ dept_info.created_by if dept_info.created_by else 'System' }}
+                                </small>
+                            </td>
+                            <td>
+                                <div class="d-flex gap-2">
+                                    <!-- Reset Password Button -->
+                                    <button class="btn-modern btn-warning btn-sm" 
+                                            onclick="showPasswordReset('{{ dept_id }}', '{{ dept_info.department_name or dept_id|title }}')" 
+                                            data-tooltip="Reset password">
+                                        <i class="fas fa-key"></i>
+                                    </button>
+                                    
+                                    <!-- Delete Button -->
+                                    <button class="btn-modern btn-danger btn-sm" 
+                                            onclick="deleteDepartment('{{ dept_id }}', '{{ dept_info.department_name or dept_id|title }}')" 
+                                            data-tooltip="Delete department">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% else %}
+            <div class="text-center py-5">
+                <div class="glass-card p-5 d-inline-block">
+                    <i class="fas fa-building text-muted mb-3" style="font-size: 3rem;"></i>
+                    <h5 class="text-muted">No Departments Found</h5>
+                    <p class="text-muted mb-0">Add your first department using the form above.</p>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<!-- Password Reset Modal -->
+<div class="modal fade" id="passwordResetModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content" style="background: var(--bg-card); border: none; border-radius: var(--border-radius);">
+            <div class="modal-header" style="border-bottom: 1px solid var(--border-color);">
+                <h5 class="modal-title text-gradient">
+                    <i class="fas fa-key me-2"></i>
+                    Reset Department Password
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <form id="passwordResetForm" method="post">
+                <div class="modal-body">
+                    <div class="form-group-modern">
+                        <label class="form-label-modern">
+                            <i class="fas fa-building"></i>
+                            Department
+                        </label>
+                        <input type="text" class="form-control-modern" id="resetDepartmentName" readonly>
+                    </div>
+                    <div class="form-group-modern">
+                        <label class="form-label-modern">
+                            <i class="fas fa-lock"></i>
+                            New Password
+                        </label>
+                        <input type="password" class="form-control-modern" name="new_password" 
+                               required placeholder="Enter new password" id="newPassword">
+                    </div>
+                </div>
+                <div class="modal-footer" style="border-top: 1px solid var(--border-color);">
+                    <button type="button" class="btn-modern btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn-modern btn-warning-modern">
+                        <i class="fas fa-key me-2"></i>
+                        Update Password
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+// Form submission handling
+document.getElementById('addDepartmentForm')?.addEventListener('submit', function(e) {
+    e.preventDefault();
+    
+    const departmentName = document.getElementById('departmentName').value.trim();
+    const password = document.getElementById('departmentPassword').value.trim();
+    
+    if (!departmentName || !password) {
+        window.modernCanteenApp?.showNotification('Please fill in all fields', 'error');
+        return;
+    }
+    
+    if (departmentName.length < 2) {
+        window.modernCanteenApp?.showNotification('Department name must be at least 2 characters', 'error');
+        return;
+    }
+    
+    if (password.length < 3) {
+        window.modernCanteenApp?.showNotification('Password must be at least 3 characters', 'error');
+        return;
+    }
+    
+    // Submit form
+    this.submit();
+});
+
+// Password reset functionality
+function showPasswordReset(deptId, deptName) {
+    document.getElementById('resetDepartmentName').value = deptName;
+    document.getElementById('passwordResetForm').action = `/reset_department_password/${deptId}`;
+    document.getElementById('newPassword').value = '';
+    
+    const modal = new bootstrap.Modal(document.getElementById('passwordResetModal'));
+    modal.show();
+}
+
+// Delete department
+function deleteDepartment(deptId, deptName) {
+    if (confirm(`Are you sure you want to delete the department "${deptName}"?\n\nThis action cannot be undone and will remove all access for this department.`)) {
+        window.location.href = `/delete_department/${deptId}`;
+    }
+}
+
+// Password reset form submission
+document.getElementById('passwordResetForm')?.addEventListener('submit', function(e) {
+    const password = document.getElementById('newPassword').value.trim();
+    
+    if (!password) {
+        e.preventDefault();
+        window.modernCanteenApp?.showNotification('Please enter a new password', 'error');
+        return;
+    }
+    
+    if (password.length < 3) {
+        e.preventDefault();
+        window.modernCanteenApp?.showNotification('Password must be at least 3 characters', 'error');
+        return;
+    }
+});
+</script>
+
+<style>
+.btn-warning {
+    background: linear-gradient(135deg, var(--warning-color), #d97706);
+    color: white;
+    border: none;
+    transition: all 0.3s ease;
+}
+
+.btn-warning:hover {
+    background: linear-gradient(135deg, #d97706, #b45309);
+    transform: translateY(-1px);
+    color: white;
+}
+
+.modal-content {
+    backdrop-filter: blur(20px);
+    box-shadow: var(--shadow-lg);
+}
+</style>
+
+{% endblock %}

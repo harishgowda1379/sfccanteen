@@ -1,0 +1,531 @@
+{% extends 'layout.html' %}
+{% block content %}
+
+<!-- Dashboard Header -->
+<div class="row mb-3">
+    <div class="col-12">
+        <div class="glass-card p-3 text-center animate-fadeIn">
+            <h4 class="gradient-text mb-1">
+                <i class="fas fa-tachometer-alt me-2"></i>
+                Admin Dashboard
+            </h4>
+            <p class="text-muted mb-0 small">Manage and monitor all canteen operations</p>
+        </div>
+    </div>
+</div>
+
+<!-- Statistics Cards -->
+<div class="row g-3 mb-3">
+    <div class="col-lg-4 col-md-6">
+        <div class="stat-card animate-fadeIn delay-1" style="padding: 1rem;">
+            <div class="d-flex align-items-center justify-content-between">
+                <div>
+                    <div class="stat-number" style="font-size: 1.5rem;">{{ orders|length }}</div>
+                    <div class="stat-label" style="font-size: 0.75rem;">Total Orders</div>
+                </div>
+                <div class="opacity-50">
+                    <i class="fas fa-clipboard-list" style="font-size: 1.5rem;"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-lg-4 col-md-6">
+        <div class="stat-card animate-fadeIn delay-2" style="padding: 1rem;">
+            <div class="d-flex align-items-center justify-content-between">
+                <div>
+                    <div class="stat-number" style="font-size: 1.5rem;">{{ orders|selectattr('status', 'equalto', 'pending')|list|length }}</div>
+                    <div class="stat-label" style="font-size: 0.75rem;">Pending Review</div>
+                </div>
+                <div class="opacity-50">
+                    <i class="fas fa-clock" style="font-size: 1.5rem;"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-lg-4 col-md-6">
+        <div class="stat-card animate-fadeIn delay-3" style="padding: 1rem;">
+            <div class="d-flex align-items-center justify-content-between">
+                <div>
+                    <div class="stat-number" style="font-size: 1.5rem;">{{ orders|selectattr('status', 'equalto', 'approved')|list|length }}</div>
+                    <div class="stat-label" style="font-size: 0.75rem;">Approved</div>
+                </div>
+                <div class="opacity-50">
+                    <i class="fas fa-check-circle" style="font-size: 1.5rem;"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+</div>
+
+<!-- Quick Actions -->
+<div class="row mb-3">
+    <div class="col-12">
+        <div class="glass-card p-3 animate-fadeIn delay-5">
+            <div class="d-flex flex-wrap align-items-center justify-content-between">
+                <h6 class="text-gradient mb-0">
+                    <i class="fas fa-bolt me-2"></i>
+                    Quick Actions
+                </h6>
+                <div class="d-flex flex-wrap gap-2 mt-2 mt-md-0">
+                    <a href="{{ url_for('manage_departments') }}" class="btn-modern btn-primary-modern btn-sm" data-tooltip="Manage department accounts">
+                        <i class="fas fa-building me-1"></i>
+                        Manage Departments
+                    </a>
+                    {% set pending_count = orders|selectattr('status', 'equalto', 'pending')|list|length %}
+                    {% if pending_count > 0 %}
+                    <button class="btn-modern btn-success-modern btn-sm" onclick="approveAllPending()" data-tooltip="Approve {{ pending_count }} pending orders">
+                        <i class="fas fa-check-double me-1"></i>
+                        Approve All Pending ({{ pending_count }})
+                    </button>
+                    {% else %}
+                    <button class="btn-modern btn-outline-secondary btn-sm" disabled data-tooltip="No pending orders to approve">
+                        <i class="fas fa-check-double me-1"></i>
+                        No Pending Orders
+                    </button>
+                    {% endif %}
+                    {% if orders|length > 0 %}
+                    <a href="{{ url_for('export_orders_excel') }}" class="btn-modern btn-warning-modern btn-sm" data-tooltip="Export {{ orders|length }} orders to Excel">
+                        <i class="fas fa-file-excel me-1"></i>
+                        Export to Excel ({{ orders|length }})
+                    </a>
+                    {% else %}
+                    <button class="btn-modern btn-outline-secondary btn-sm" disabled data-tooltip="No orders to export">
+                        <i class="fas fa-file-excel me-1"></i>
+                        No Orders to Export
+                    </button>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Orders Management Section -->
+<div class="row">
+    <div class="col-12">
+        <div class="glass-card p-3 animate-fadeIn delay-6">
+            <div class="d-flex align-items-center justify-content-between mb-3">
+                <h5 class="text-gradient mb-0">
+                    <i class="fas fa-list-alt me-2"></i>
+                    Orders Management
+                </h5>
+                <div class="d-flex align-items-center gap-2">
+                    <!-- Search Filter -->
+                    <div class="input-group" style="width: 250px;">
+                        <input type="text" class="form-control-modern form-control-sm" id="searchFilter" 
+                               placeholder="Search orders..." style="border-radius: 8px 0 0 8px;">
+                        <button class="btn-modern btn-primary-modern btn-sm" type="button" style="border-radius: 0 8px 8px 0;">
+                            <i class="fas fa-search"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Modern Tab Navigation -->
+            <div class="d-flex flex-wrap gap-1 mb-3">
+                <button class="btn-modern btn-primary-modern btn-sm active" data-filter="all" onclick="filterOrders('all')">
+                    <i class="fas fa-list me-1"></i>All Orders
+                    <span class="badge bg-light text-dark ms-1" style="font-size: 0.65rem;">{{ orders|length }}</span>
+                </button>
+                <button class="btn-modern btn-outline-warning btn-sm" data-filter="pending" onclick="filterOrders('pending')">
+                    <i class="fas fa-clock me-1"></i>Pending
+                    <span class="badge bg-warning ms-1" style="font-size: 0.65rem;">{{ orders|selectattr('status', 'equalto', 'pending')|list|length }}</span>
+                </button>
+                <button class="btn-modern btn-outline-success btn-sm" data-filter="approved" onclick="filterOrders('approved')">
+                    <i class="fas fa-check me-1"></i>Approved
+                    <span class="badge bg-success ms-1" style="font-size: 0.65rem;">{{ orders|selectattr('status', 'equalto', 'approved')|list|length }}</span>
+                </button>
+                <button class="btn-modern btn-outline-danger btn-sm" data-filter="rejected" onclick="filterOrders('rejected')">
+                    <i class="fas fa-times me-1"></i>Rejected
+                    <span class="badge bg-danger ms-1" style="font-size: 0.65rem;">{{ orders|selectattr('status', 'equalto', 'rejected')|list|length }}</span>
+                </button>
+            </div>
+
+            <!-- Orders Table -->
+            <div class="table-responsive">
+                {% if orders %}
+                <table class="table-modern table" id="ordersTable">
+                    <thead>
+                        <tr>
+                            <th>
+                                <i class="fas fa-calendar-alt me-2"></i>
+                                Event Details
+                            </th>
+                            <th>
+                                <i class="fas fa-building me-2"></i>
+                                Department
+                            </th>
+                            <th>
+                                <i class="fas fa-user me-2"></i>
+                                Requested By
+                            </th>
+                            <th>
+                                <i class="fas fa-info-circle me-2"></i>
+                                Status
+                            </th>
+                            <th>
+                                <i class="fas fa-rupee-sign me-2"></i>
+                                Amount
+                            </th>
+                            <th>
+                                <i class="fas fa-cogs me-2"></i>
+                                Actions
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for order in orders %}
+                        <tr class="order-row animate-fadeIn" data-status="{{ order.status }}" style="animation-delay: {{ loop.index * 0.05 }}s;">
+                            <td>
+                                <div>
+                                    <strong class="d-block">{{ order.event_name or 'Unnamed Event' }}</strong>
+                                    <small class="text-muted">
+                                        <i class="fas fa-calendar me-1"></i>
+                                        {{ order.event_date or 'No date' }}
+                                        {% if order.event_time %}
+                                        <br><i class="fas fa-clock me-1"></i>{{ order.event_time }}
+                                        {% endif %}
+                                    </small>
+                                </div>
+                            </td>
+                            <td>
+                                <span class="fw-500">{{ order.department or 'N/A' }}</span>
+                            </td>
+                            <td>
+                                <div class="d-flex align-items-center">
+                                    <div class="bg-primary rounded-circle d-flex align-items-center justify-content-center me-2" 
+                                         style="width: 32px; height: 32px; font-size: 0.8rem; color: white;">
+                                        {{ order.ordered_by[0]|upper if order.ordered_by else '?' }}
+                                    </div>
+                                    <span class="fw-500">{{ order.ordered_by or 'Unknown' }}</span>
+                                </div>
+                            </td>
+                            <td>
+                                <span class="status-badge status-{{ order.status }}">
+                                    <i class="fas fa-{{ 'clock' if order.status == 'pending' else 'check' if order.status == 'approved' else 'times' }} me-1"></i>
+                                    {{ order.status|capitalize }}
+                                </span>
+                            </td>
+                            <td>
+                                <strong class="text-success">
+                                    {% if order.estimated_amount %}
+                                    ₹{{ "{:,.0f}".format(order.estimated_amount) }}
+                                    {% else %}
+                                    <span class="text-muted">Not specified</span>
+                                    {% endif %}
+                                </strong>
+                            </td>
+                            <td>
+                                <div class="d-flex gap-2">
+                                    {% if order.status == 'pending' %}
+                                    <button class="btn-modern btn-success-modern btn-sm" 
+                                            onclick="approveOrder({{ order.id }})" 
+                                            data-tooltip="Approve this order">
+                                        <i class="fas fa-check"></i>
+                                    </button>
+                                    <button class="btn-modern btn-danger btn-sm" 
+                                            onclick="rejectOrder({{ order.id }})" 
+                                            data-tooltip="Reject this order">
+                                        <i class="fas fa-times"></i>
+                                    </button>
+                                    {% endif %}
+                                    <button class="btn-modern btn-primary-modern btn-sm" 
+                                            onclick="viewOrderDetails({{ order.id }})" 
+                                            data-tooltip="View order details">
+                                        <i class="fas fa-eye"></i>
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+                {% else %}
+                <div class="text-center py-5">
+                    <div class="glass-card p-5 d-inline-block">
+                        <i class="fas fa-inbox text-muted mb-3" style="font-size: 3rem;"></i>
+                        <h5 class="text-muted">No Orders Found</h5>
+                        <p class="text-muted mb-0">No orders have been submitted yet.</p>
+                    </div>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Enhanced JavaScript -->
+<script>
+// Dashboard functionality
+let currentFilter = 'all';
+
+function filterOrders(status) {
+    currentFilter = status;
+    
+    // Update active button
+    document.querySelectorAll('[data-filter]').forEach(btn => {
+        btn.classList.remove('btn-primary-modern', 'active');
+        btn.classList.add('btn-outline-secondary');
+    });
+    
+    const activeBtn = document.querySelector(`[data-filter="${status}"]`);
+    if (activeBtn) {
+        activeBtn.classList.remove('btn-outline-secondary');
+        activeBtn.classList.add('btn-primary-modern', 'active');
+    }
+    
+    // Filter table rows
+    const rows = document.querySelectorAll('.order-row');
+    rows.forEach((row, index) => {
+        const rowStatus = row.dataset.status;
+        const shouldShow = status === 'all' || rowStatus === status;
+        
+        if (shouldShow) {
+            row.style.display = '';
+            row.style.animationDelay = `${index * 0.05}s`;
+            row.classList.add('animate-fadeIn');
+        } else {
+            row.style.display = 'none';
+        }
+    });
+    
+    updateEmptyState(status);
+}
+
+function updateEmptyState(status) {
+    const table = document.getElementById('ordersTable');
+    const visibleRows = document.querySelectorAll('.order-row:not([style*="display: none"])');
+    
+    if (visibleRows.length === 0 && table) {
+        let emptyState = document.getElementById('emptyState');
+        if (!emptyState) {
+            emptyState = document.createElement('div');
+            emptyState.id = 'emptyState';
+            emptyState.className = 'text-center py-5';
+            emptyState.innerHTML = `
+                <div class="glass-card p-5 d-inline-block animate-fadeIn">
+                    <i class="fas fa-search text-muted mb-3" style="font-size: 3rem;"></i>
+                    <h5 class="text-muted">No ${status === 'all' ? '' : status.charAt(0).toUpperCase() + status.slice(1)} Orders Found</h5>
+                    <p class="text-muted mb-0">Try adjusting your search or filters.</p>
+                </div>
+            `;
+            table.parentNode.appendChild(emptyState);
+        }
+        table.style.display = 'none';
+    } else {
+        const emptyState = document.getElementById('emptyState');
+        if (emptyState) {
+            emptyState.remove();
+        }
+        if (table) {
+            table.style.display = '';
+        }
+    }
+}
+
+// Search functionality
+document.getElementById('searchFilter')?.addEventListener('input', function() {
+    const searchTerm = this.value.toLowerCase();
+    const rows = document.querySelectorAll('.order-row');
+    
+    rows.forEach(row => {
+        const text = row.textContent.toLowerCase();
+        const matchesSearch = text.includes(searchTerm);
+        const matchesFilter = currentFilter === 'all' || row.dataset.status === currentFilter;
+        
+        row.style.display = (matchesSearch && matchesFilter) ? '' : 'none';
+    });
+});
+
+// Admin actions
+function approveOrder(orderId) {
+    if (confirm('Are you sure you want to approve this order?')) {
+        // Show loading state
+        const button = event.target.closest('button');
+        button.classList.add('loading');
+        button.disabled = true;
+        
+        // Navigate to approval URL
+        window.location.href = `/approve_order/${orderId}`;
+    }
+}
+
+function rejectOrder(orderId) {
+    const reason = prompt('Please provide a reason for rejection (optional):');
+    if (confirm('Are you sure you want to reject this order?')) {
+        // Show loading state
+        const button = event.target.closest('button');
+        button.classList.add('loading');
+        button.disabled = true;
+        
+        // Navigate to rejection URL
+        window.location.href = `/reject_order/${orderId}`;
+    }
+}
+
+function approveAllPending() {
+    const pendingCount = document.querySelectorAll('[data-status="pending"]').length;
+    
+    if (pendingCount === 0) {
+        window.modernCanteenApp?.showNotification('No pending orders to approve', 'info');
+        return;
+    }
+    
+    if (confirm(`Are you sure you want to approve all ${pendingCount} pending orders?`)) {
+        const button = event.target.closest('button');
+        if (button) {
+            button.classList.add('loading');
+            button.disabled = true;
+        }
+        
+        // Navigate to approve all pending URL
+        window.location.href = '/approve_all_pending';
+    }
+}
+
+function viewOrderDetails(orderId) {
+    // Create a modal or show order details
+    const orderRow = document.querySelector(`[data-status]:has(button[onclick*="${orderId}"])`);
+    if (orderRow) {
+        window.modernCanteenApp?.showNotification(`Order #${orderId} details - Feature enhanced! Click to see more.`, 'info');
+    }
+}
+
+function refreshDashboard() {
+    const refreshButton = event.target;
+    refreshButton.classList.add('loading');
+    
+    // Simulate refresh
+    setTimeout(() => {
+        window.location.reload();
+    }, 500);
+}
+
+// Initialize dashboard on load
+document.addEventListener('DOMContentLoaded', function() {
+    // Initialize filter
+    filterOrders('all');
+    
+    // Add hover effects to rows
+    const rows = document.querySelectorAll('.order-row');
+    rows.forEach((row, index) => {
+        row.style.animationDelay = `${index * 0.1}s`;
+        
+        // Add click handler for row details
+        row.addEventListener('click', function(e) {
+            // Don't trigger if clicking on buttons
+            if (!e.target.closest('button')) {
+                const orderId = this.querySelector('button[onclick*="viewOrderDetails"]')?.onclick?.toString().match(/\d+/)?.[0];
+                if (orderId) {
+                    viewOrderDetails(orderId);
+                }
+            }
+        });
+    });
+});
+</script>
+
+<style>
+/* Dashboard-specific styles */
+.btn-modern.btn-outline-warning {
+    border-color: var(--warning-color);
+    color: var(--warning-color);
+    background: transparent;
+}
+
+.btn-modern.btn-outline-warning:hover {
+    background: var(--warning-color);
+    color: white;
+}
+
+.btn-modern.btn-outline-success {
+    border-color: var(--accent-color);
+    color: var(--accent-color);
+    background: transparent;
+}
+
+.btn-modern.btn-outline-success:hover {
+    background: var(--accent-color);
+    color: white;
+}
+
+.btn-modern.btn-outline-danger {
+    border-color: var(--danger-color);
+    color: var(--danger-color);
+    background: transparent;
+}
+
+.btn-modern.btn-outline-danger:hover {
+    background: var(--danger-color);
+    color: white;
+}
+
+.btn-modern.btn-outline-secondary {
+    border-color: var(--border-color);
+    color: var(--text-secondary);
+    background: transparent;
+}
+
+.btn-modern.btn-outline-secondary:hover {
+    background: var(--secondary-color);
+    color: var(--primary-color);
+    border-color: var(--primary-color);
+}
+
+/* Table enhancements */
+.table-modern tbody tr {
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.table-modern tbody tr:hover {
+    transform: scale(1.01);
+    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+}
+
+.order-row {
+    transition: all 0.3s ease;
+}
+
+/* Filter button animations */
+[data-filter] {
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+[data-filter]:not(.active):hover {
+    transform: translateY(-1px);
+}
+
+/* Quick actions styling */
+.btn-sm.btn-modern {
+    padding: 0.4rem 0.8rem;
+    font-size: 0.8rem;
+}
+
+/* Search input styling */
+.input-group .form-control-modern:focus {
+    box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+    border-color: var(--primary-color);
+}
+
+/* Danger button styling */
+.btn-danger {
+    background: linear-gradient(135deg, var(--danger-color), #dc2626);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    transition: all 0.3s ease;
+}
+
+.btn-danger:hover {
+    background: linear-gradient(135deg, #dc2626, #b91c1c);
+    transform: translateY(-1px);
+    color: white;
+}
+</style>
+{% endblock %}

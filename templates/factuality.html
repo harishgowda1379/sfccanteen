@@ -1,0 +1,32 @@
+{% extends 'layout.html' %}
+{% block content %}
+<div class="row justify-content-center">
+  <div class="col-md-8">
+    <div class="card card-modern p-4">
+      <h4>Factuality Notices</h4>
+      {% if session.get('role') == 'admin' %}
+        <form method="post" action="{{ url_for('post_notice') }}" class="mb-4">
+          <div class="mb-3"><input class="form-control" name="title" placeholder="Title" required></div>
+          <div class="mb-3"><textarea class="form-control" name="body" placeholder="Body" rows="3" required></textarea></div>
+          <button class="btn btn-success">Post Notice</button>
+        </form>
+      {% endif %}
+      {% for notice in notices|reverse %}
+        <div class="card mb-2">
+          <div class="card-body">
+            <h5>{{ notice.title }}</h5>
+            <p>{{ notice.body }}</p>
+            <small class="text-muted">Posted by {{ notice.posted_by }} on {{ notice.timestamp }}</small>
+            {% if session.get('role') == 'admin' %}
+              <a href="{{ url_for('delete_notice', index=loop.index0) }}" class="btn btn-danger btn-sm float-end">Delete</a>
+            {% endif %}
+          </div>
+        </div>
+      {% endfor %}
+      {% if not notices %}
+        <div class="text-muted">No notices yet.</div>
+      {% endif %}
+    </div>
+  </div>
+</div>
+{% endblock %}

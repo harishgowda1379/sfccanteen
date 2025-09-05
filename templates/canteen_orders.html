@@ -1,0 +1,312 @@
+{% extends "layout.html" %}
+{% block content %}
+
+<!-- Dashboard Header -->
+<div class="row mb-3">
+  <div class="col-12">
+    <div class="glass-card p-3 text-center animate-fadeIn">
+      <h4 class="gradient-text mb-1">
+        <i class="fas fa-utensils me-2"></i>
+        Canteen Operations
+      </h4>
+      <p class="text-muted mb-0 small">Manage approved orders and fulfillment status</p>
+    </div>
+  </div>
+</div>
+
+<!-- Statistics Cards -->
+<div class="row g-3 mb-3">
+  <div class="col-lg-4 col-md-6">
+    <div class="stat-card animate-fadeIn delay-1" style="padding: 1rem;">
+      <div class="d-flex align-items-center justify-content-between">
+        <div>
+          <div class="stat-number" style="font-size: 1.5rem;">{{ orders|length }}</div>
+          <div class="stat-label" style="font-size: 0.75rem;">Active Orders</div>
+        </div>
+        <div class="opacity-50">
+          <i class="fas fa-clipboard-list" style="font-size: 1.5rem;"></i>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <div class="col-lg-4 col-md-6">
+    <div class="stat-card animate-fadeIn delay-2" style="padding: 1rem;">
+      <div class="d-flex align-items-center justify-content-between">
+        <div>
+          <div class="stat-number" style="font-size: 1.5rem;">
+            {% set total_persons = 0 %}
+            {% for order in orders %}
+              {% if order.number_of_persons %}
+                {% set total_persons = total_persons + (order.number_of_persons|int if order.number_of_persons is string else order.number_of_persons) %}
+              {% endif %}
+            {% endfor %}
+            {{ total_persons }}
+          </div>
+          <div class="stat-label" style="font-size: 0.75rem;">Total Persons</div>
+        </div>
+        <div class="opacity-50">
+          <i class="fas fa-users" style="font-size: 1.5rem;"></i>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <div class="col-lg-4 col-md-6">
+    <div class="stat-card animate-fadeIn delay-3" style="padding: 1rem;">
+      <div class="d-flex align-items-center justify-content-between">
+        <div>
+          <div class="stat-number" style="font-size: 1.5rem;">
+            {% set total_amount = 0 %}
+            {% for order in orders %}
+              {% if order.estimated_amount %}
+                {% set total_amount = total_amount + (order.estimated_amount|float if order.estimated_amount is string else order.estimated_amount) %}
+              {% endif %}
+            {% endfor %}
+            ₹{{ "{:,.0f}".format(total_amount) if total_amount > 0 else '0' }}
+          </div>
+          <div class="stat-label" style="font-size: 0.75rem;">Total Value</div>
+        </div>
+        <div class="opacity-50">
+          <i class="fas fa-rupee-sign" style="font-size: 1.5rem;"></i>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Quick Actions -->
+<div class="row mb-3">
+  <div class="col-12">
+    <div class="glass-card p-3 animate-fadeIn delay-4">
+      <div class="d-flex flex-wrap align-items-center justify-content-between">
+        <h6 class="text-gradient mb-0">
+          <i class="fas fa-bolt me-2"></i>
+          Quick Actions
+        </h6>
+        <div class="d-flex flex-wrap gap-2 mt-2 mt-md-0">
+          {% if orders|length > 0 %}
+          <button class="btn-modern btn-success-modern btn-sm" onclick="completeAllOrders()" data-tooltip="Mark {{ orders|length }} orders as completed">
+            <i class="fas fa-check-double me-1"></i>
+            Complete All Orders ({{ orders|length }})
+          </button>
+          {% else %}
+          <button class="btn-modern btn-outline-secondary btn-sm" disabled data-tooltip="No orders available to complete">
+            <i class="fas fa-check-double me-1"></i>
+            No Orders to Complete
+          </button>
+          {% endif %}
+          <button class="btn-modern btn-primary-modern btn-sm" onclick="refreshPage()" data-tooltip="Refresh the page">
+            <i class="fas fa-sync-alt me-1"></i>
+            Refresh
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Orders Management -->
+<div class="row">
+  <div class="col-12">
+    <div class="glass-card p-3 animate-fadeIn delay-5">
+      <h5 class="text-gradient mb-3">
+        <i class="fas fa-tasks me-2"></i>
+        Orders Ready for Fulfillment
+      </h5>
+      
+      {% if orders %}
+        <div class="row g-3">
+          {% for order in orders %}
+            <div class="col-lg-6">
+              <div class="glass-card p-3 card-hover order-card animate-fadeIn" data-order-id="{{ order.id }}" style="animation-delay: {{ loop.index0 * 0.1 }}s;">
+                <!-- Order Header -->
+                <div class="d-flex justify-content-between align-items-start mb-2">
+                  <div class="d-flex align-items-center">
+                    <div class="bg-success rounded-circle d-flex align-items-center justify-content-center me-2" 
+                         style="width: 32px; height: 32px; font-size: 0.8rem;">
+                      <i class="fas fa-utensils text-white"></i>
+                    </div>
+                    <div>
+                      <div class="text-gradient fw-bold small">#{{ order.id }} - {{ order.event_name or 'Unnamed Event' }}</div>
+                      <div class="text-muted" style="font-size: 0.75rem;">{{ order.department }}</div>
+                    </div>
+                  </div>
+                  <span class="status-badge status-approved" style="font-size: 0.7rem; padding: 0.25rem 0.5rem;">
+                    <i class="fas fa-check-circle me-1"></i>
+                    Ready
+                  </span>
+                </div>
+                
+                <!-- Order Details -->
+                <div class="row g-2 mb-3">
+                  <div class="col-6">
+                    <div class="text-muted" style="font-size: 0.7rem;">
+                      <i class="fas fa-calendar me-1"></i>
+                      Event Date
+                    </div>
+                    <div class="fw-bold" style="font-size: 0.8rem;">{{ order.event_date or 'Not specified' }}</div>
+                  </div>
+                  <div class="col-6">
+                    <div class="text-muted" style="font-size: 0.7rem;">
+                      <i class="fas fa-clock me-1"></i>
+                      Event Time
+                    </div>
+                    <div class="fw-bold" style="font-size: 0.8rem;">{{ order.event_time or 'Not specified' }}</div>
+                  </div>
+                  <div class="col-6">
+                    <div class="text-muted" style="font-size: 0.7rem;">
+                      <i class="fas fa-user me-1"></i>
+                      Ordered by
+                    </div>
+                    <div class="fw-bold" style="font-size: 0.8rem;">{{ order.ordered_by }}</div>
+                  </div>
+                  <div class="col-6">
+                    <div class="text-muted" style="font-size: 0.7rem;">
+                      <i class="fas fa-users me-1"></i>
+                      Persons
+                    </div>
+                    <div class="fw-bold" style="font-size: 0.8rem;">{{ order.number_of_persons or 'Not specified' }}</div>
+                  </div>
+                </div>
+                
+                <!-- Items Required -->
+                <div class="mb-2">
+                  <div class="text-muted" style="font-size: 0.7rem;">
+                    <i class="fas fa-list me-1"></i>
+                    Items Required
+                  </div>
+                  <div class="fw-bold" style="font-size: 0.8rem;">{{ order.items_required or 'No items specified' }}</div>
+                </div>
+                
+                <!-- Cost Information -->
+                {% if order.estimated_amount and order.estimated_amount > 0 %}
+                <div class="mb-2">
+                  <div class="text-muted" style="font-size: 0.7rem;">
+                    <i class="fas fa-rupee-sign me-1"></i>
+                    Estimated Cost
+                  </div>
+                  <div class="fw-bold text-success" style="font-size: 0.9rem;">₹{{ "{:,.0f}".format(order.estimated_amount|float) if order.estimated_amount else '0' }}</div>
+                </div>
+                {% endif %}
+                
+                <!-- Special Notes -->
+                {% if order.remarks %}
+                <div class="mb-3">
+                  <div class="text-muted" style="font-size: 0.7rem;">
+                    <i class="fas fa-sticky-note me-1"></i>
+                    Special Notes
+                  </div>
+                  <div class="alert p-2" style="background: rgba(99, 102, 241, 0.05); border: 1px solid rgba(99, 102, 241, 0.1); color: var(--text-color); font-size: 0.8rem;">
+                    {{ order.remarks }}
+                  </div>
+                </div>
+                {% endif %}
+                
+                <!-- Action Button -->
+                <div class="d-grid">
+                  <button class="btn-modern btn-success-modern btn-sm" onclick="markOrderComplete({{ order.id }})" data-tooltip="Mark this order as completed">
+                    <i class="fas fa-check me-1"></i>
+                    Mark as Completed
+                  </button>
+                </div>
+              </div>
+            </div>
+          {% endfor %}
+        </div>
+      {% else %}
+        <div class="text-center py-5">
+          <div class="glass-card p-5 d-inline-block">
+            <i class="fas fa-clipboard-check text-success mb-3" style="font-size: 4rem;"></i>
+            <h5 class="text-muted">No Orders Ready</h5>
+            <p class="text-muted mb-0">No approved orders are currently waiting for fulfillment.</p>
+            <button class="btn-modern btn-primary-modern mt-3" onclick="refreshPage()">
+              <i class="fas fa-sync-alt me-2"></i>
+              Refresh
+            </button>
+          </div>
+        </div>
+      {% endif %}
+    </div>
+  </div>
+</div>
+
+<script>
+// Mark individual order as complete
+function markOrderComplete(orderId) {
+  if (confirm('Are you sure you want to mark this order as completed?')) {
+    const button = event.target.closest('button');
+    button.classList.add('loading');
+    button.disabled = true;
+    
+    // Navigate to complete order URL
+    window.location.href = `/complete_order/${orderId}`;
+  }
+}
+
+// Complete all orders
+function completeAllOrders() {
+  const orderCount = {{ orders|length }};
+  
+  if (orderCount === 0) {
+    window.modernCanteenApp?.showNotification('No orders available to complete', 'info');
+    return;
+  }
+  
+  if (confirm(`Are you sure you want to mark all ${orderCount} orders as completed?`)) {
+    const button = event.target;
+    button.classList.add('loading');
+    button.disabled = true;
+    
+    // Navigate to complete all orders URL
+    window.location.href = '/complete_all_orders';
+  }
+}
+
+// Refresh page
+function refreshPage() {
+  const button = event.target;
+  button.classList.add('loading');
+  
+  setTimeout(() => {
+    window.location.reload();
+  }, 500);
+}
+
+// Initialize page
+document.addEventListener('DOMContentLoaded', function() {
+  // Add click handlers to order cards for quick actions
+  const orderCards = document.querySelectorAll('.order-card');
+  orderCards.forEach(card => {
+    card.addEventListener('click', function(e) {
+      // Don't trigger if clicking on buttons
+      if (!e.target.closest('button')) {
+        const orderId = this.dataset.orderId;
+        if (orderId) {
+          // Highlight the clicked card
+          orderCards.forEach(c => c.classList.remove('border-primary'));
+          this.classList.add('border-primary');
+        }
+      }
+    });
+  });
+});
+</script>
+
+<style>
+.order-card {
+  transition: all 0.3s ease;
+  cursor: pointer;
+}
+
+.order-card:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-lg);
+}
+
+.order-card.border-primary {
+  border: 2px solid var(--primary-color) !important;
+}
+</style>
+
+{% endblock %}

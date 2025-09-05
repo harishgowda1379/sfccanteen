@@ -1,0 +1,462 @@
+{% extends 'layout.html' %}
+{% block content %}
+
+<!-- Page Header -->
+<div class="row mb-4">
+  <div class="col-12">
+    <div class="glass-card p-4 text-center animate-fadeIn">
+      <h2 class="gradient-text mb-2">
+        <i class="fas fa-plus-circle me-3"></i>
+        Place New Order
+      </h2>
+      <p class="text-muted mb-0">Submit your canteen order request for review</p>
+    </div>
+  </div>
+</div>
+
+<div class="row">
+  <div class="col-lg-8">
+    <!-- Modern Order Form -->
+    <div class="glass-card p-4 mb-4 animate-fadeIn delay-1">
+      <div class="d-flex align-items-center mb-4">
+        <div class="bg-primary rounded-circle d-flex align-items-center justify-content-center me-3" style="width: 50px; height: 50px;">
+          <i class="fas fa-clipboard-list text-white" style="font-size: 1.2rem;"></i>
+        </div>
+        <div>
+          <h4 class="text-gradient mb-1">Order Details</h4>
+          <p class="text-muted small mb-0">Fill in all required information carefully</p>
+        </div>
+      </div>
+      
+      <form method="post" id="orderForm" class="needs-validation" novalidate>
+        <!-- Progress Steps -->
+        <div class="progress-steps mb-4">
+          <div class="step active">1</div>
+          <div class="step">2</div>
+        </div>
+        
+        <!-- Step 1: Order Details -->
+        <div class="form-step" id="step1">
+          <h5 class="text-gradient mb-3"><i class="fas fa-clipboard-list me-2"></i>Order Details</h5>
+          
+          <div class="row">
+            <div class="col-md-6">
+              <div class="form-group-modern">
+                <label class="form-label-modern">
+                  <i class="fas fa-building"></i>
+                  Department *
+                </label>
+                <input class="form-control-modern" name="department" id="department" required 
+                       placeholder="Enter your department name">
+                <div class="invalid-feedback">Please enter your department name</div>
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="form-group-modern">
+                <label class="form-label-modern">
+                  <i class="fas fa-calendar-star"></i>
+                  Event Name *
+                </label>
+                <input class="form-control-modern" name="eventName" id="eventName" required 
+                       placeholder="Name of the event or occasion">
+                <div class="invalid-feedback">Event name is required</div>
+              </div>
+            </div>
+          </div>
+          
+          <div class="row">
+            <div class="col-md-4">
+              <div class="form-group-modern">
+                <label class="form-label-modern">
+                  <i class="fas fa-calendar-day"></i>
+                  Event Date *
+                </label>
+                <input class="form-control-modern" type="date" name="eventDate" id="eventDate" required>
+                <div class="invalid-feedback">Please select a date</div>
+              </div>
+            </div>
+            <div class="col-md-4">
+              <div class="form-group-modern">
+                <label class="form-label-modern">
+                  <i class="fas fa-clock"></i>
+                  Event Time
+                </label>
+                <input class="form-control-modern" type="time" name="eventTime" id="eventTime">
+              </div>
+            </div>
+            <div class="col-md-4">
+              <div class="form-group-modern">
+                <label class="form-label-modern">
+                  <i class="fas fa-users"></i>
+                  Number of Persons *
+                </label>
+                <input class="form-control-modern" type="number" name="numberOfPersons" id="numberOfPersons" 
+                       required min="1" placeholder="Enter number of persons">
+                <div class="invalid-feedback">Please enter number of persons</div>
+              </div>
+            </div>
+          </div>
+          
+          <div class="form-group-modern">
+            <label class="form-label-modern">
+              <i class="fas fa-utensils"></i>
+              Items Required *
+            </label>
+            <textarea class="form-control-modern" name="itemsRequired" id="itemsRequired" required 
+                      rows="4" placeholder="List the items you need (e.g., Tea, Coffee, Snacks, Meals)"></textarea>
+            <div class="invalid-feedback">Please specify the items required</div>
+          </div>
+          
+          <div class="form-group-modern">
+            <label class="form-label-modern">
+              <i class="fas fa-comment-alt"></i>
+              Special Instructions (Optional)
+            </label>
+            <textarea class="form-control-modern" name="remarks" id="remarks" rows="3" 
+                      placeholder="Any special requirements, dietary restrictions, or additional notes..."></textarea>
+          </div>
+          
+          <div class="d-flex justify-content-end mt-4">
+            <button type="button" class="btn-modern btn-primary-modern" onclick="nextStep(1)">
+              Review Order <i class="fas fa-arrow-right ms-2"></i>
+            </button>
+          </div>
+        </div>
+        
+        <!-- Step 2: Review & Submit -->
+        <div class="form-step d-none" id="step2">
+          <h5 class="text-gradient mb-3"><i class="fas fa-check-circle me-2"></i>Review & Submit</h5>
+          
+          <div class="glass-card p-4 mb-4" style="background: rgba(99, 102, 241, 0.05);">
+            <h6 class="text-gradient mb-3">Order Summary</h6>
+            <div id="orderSummary">
+              <!-- Order summary will be populated by JavaScript -->
+            </div>
+          </div>
+          
+          <div class="form-check-modern mb-4">
+            <input type="checkbox" id="confirmOrder" required>
+            <span class="checkmark"></span>
+            <label for="confirmOrder">I confirm that all the information is correct and ready to submit</label>
+          </div>
+          
+          <div class="d-flex justify-content-between mt-4">
+            <button type="button" class="btn-modern btn-outline-secondary" onclick="prevStep(2)">
+              <i class="fas fa-arrow-left me-2"></i> Back to Edit
+            </button>
+            <button type="submit" class="btn-modern btn-success-modern" id="submitBtn">
+              <i class="fas fa-paper-plane me-2"></i> Submit Order
+            </button>
+          </div>
+        </div>
+      </form>
+    </div>
+
+    <!-- Recent Orders -->
+    <div class="glass-card p-4 animate-fadeIn delay-2">
+      <div class="d-flex align-items-center mb-4">
+        <div class="bg-accent rounded-circle d-flex align-items-center justify-content-center me-3" style="width: 40px; height: 40px; background: var(--accent-color) !important;">
+          <i class="fas fa-history text-white"></i>
+        </div>
+        <div>
+          <h5 class="text-gradient mb-1">Your Recent Orders</h5>
+          <p class="text-muted small mb-0">Track your order history and status</p>
+        </div>
+      </div>
+      
+      {% if orders %}
+        <div class="row g-3">
+          {% for o in orders|reverse %}
+            <div class="col-12">
+              <div class="card-hover glass-card p-3">
+                <div class="d-flex justify-content-between align-items-start">
+                  <div class="flex-grow-1">
+                    <div class="d-flex align-items-center mb-2">
+                      <span class="badge bg-primary me-2">#{{ o.id }}</span>
+                      <strong class="text-gradient">{{ o.event_name or 'Unnamed Event' }}</strong>
+                      <span class="status-badge status-{{ o.status }} ms-auto">
+                        <i class="fas fa-{{ 'clock' if o.status == 'pending' else 'check' if o.status == 'approved' else 'times' if o.status == 'rejected' else 'check-double' }} me-1"></i>
+                        {{ o.status|capitalize }}
+                      </span>
+                    </div>
+                    
+                    <div class="row small text-muted">
+                      <div class="col-md-6">
+                        <i class="fas fa-calendar me-1"></i>
+                        {{ o.event_date or 'No date specified' }}
+                        {% if o.event_time %}
+                          at {{ o.event_time }}
+                        {% endif %}
+                      </div>
+                      <div class="col-md-6">
+                        <i class="fas fa-clock me-1"></i>
+                        Ordered: {{ o.timestamp }}
+                      </div>
+                    </div>
+                    
+                    {% if o.estimated_amount %}
+                    <div class="mt-2">
+                      <span class="small text-success fw-bold">
+                        <i class="fas fa-rupee-sign me-1"></i>
+                        Estimated: ₹{{ "{:,.0f}".format(o.estimated_amount) }}
+                      </span>
+                    </div>
+                    {% endif %}
+                  </div>
+                  
+                  <div class="text-end">
+                    <button class="btn btn-outline-primary btn-sm" onclick="viewOrderDetails({{ o.id }})" 
+                            data-tooltip="View full details">
+                      <i class="fas fa-eye"></i>
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          {% endfor %}
+        </div>
+      {% else %}
+        <div class="text-center py-4">
+          <div class="glass-card p-4 d-inline-block">
+            <i class="fas fa-clipboard-list text-muted mb-3" style="font-size: 3rem;"></i>
+            <h6 class="text-muted">No Orders Yet</h6>
+            <p class="text-muted mb-0">Your order history will appear here once you submit your first order.</p>
+          </div>
+        </div>
+      {% endif %}
+    </div>
+  </div>
+
+  <!-- Sidebar -->
+  <div class="col-lg-4">
+    <!-- Contact Support -->
+    <div class="glass-card p-4 animate-fadeIn delay-3">
+      <h6 class="text-gradient mb-3">
+        <i class="fas fa-envelope me-2"></i>
+        Need Support?
+      </h6>
+      <p class="text-muted mb-3">Having trouble with your order? Contact us directly.</p>
+      
+      <div class="d-flex align-items-center p-3 rounded" style="background: rgba(99, 102, 241, 0.05); border: 1px solid rgba(99, 102, 241, 0.1);">
+        <div class="bg-primary rounded-circle d-flex align-items-center justify-content-center me-3" style="width: 40px; height: 40px;">
+          <i class="fas fa-envelope text-white"></i>
+        </div>
+        <div>
+          <div class="fw-bold text-primary mb-1">Email Support</div>
+          <a href="mailto:rudra04115@gmail.com" class="text-decoration-none">
+            <small class="text-muted">rudra04115@gmail.com</small>
+          </a>
+        </div>
+      </div>
+      
+      <div class="d-grid mt-3">
+        <a href="mailto:rudra04115@gmail.com?subject=Canteen Order Support" class="btn-modern btn-outline-primary">
+          <i class="fas fa-paper-plane me-2"></i>
+          Send Email
+        </a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Enhanced JavaScript -->
+<script>
+let currentStep = 1;
+const totalSteps = 2;
+
+// Step Navigation Functions
+function nextStep(step) {
+  if (validateCurrentStep(step)) {
+    hideStep(step);
+    showStep(step + 1);
+    updateProgressSteps(step + 1);
+    currentStep = step + 1;
+    
+    if (step + 1 === 2) {
+      updateOrderSummary();
+    }
+  }
+}
+
+function prevStep(step) {
+  hideStep(step);
+  showStep(step - 1);
+  updateProgressSteps(step - 1);
+  currentStep = step - 1;
+}
+
+function hideStep(step) {
+  document.getElementById(`step${step}`).classList.add('d-none');
+}
+
+function showStep(step) {
+  document.getElementById(`step${step}`).classList.remove('d-none');
+  // Animate in
+  const stepEl = document.getElementById(`step${step}`);
+  stepEl.style.opacity = '0';
+  stepEl.style.transform = 'translateX(20px)';
+  setTimeout(() => {
+    stepEl.style.transition = 'all 0.3s ease';
+    stepEl.style.opacity = '1';
+    stepEl.style.transform = 'translateX(0)';
+  }, 10);
+}
+
+function updateProgressSteps(step) {
+  const steps = document.querySelectorAll('.step');
+  steps.forEach((s, index) => {
+    s.classList.remove('active', 'completed');
+    if (index < step - 1) {
+      s.classList.add('completed');
+    } else if (index === step - 1) {
+      s.classList.add('active');
+    }
+  });
+}
+
+function validateCurrentStep(step) {
+  const stepEl = document.getElementById(`step${step}`);
+  const requiredFields = stepEl.querySelectorAll('[required]');
+  let isValid = true;
+  
+  requiredFields.forEach(field => {
+    if (!field.value.trim()) {
+      field.classList.add('is-invalid');
+      isValid = false;
+    } else {
+      field.classList.remove('is-invalid');
+      field.classList.add('is-valid');
+    }
+  });
+  
+  if (!isValid) {
+    window.modernCanteenApp?.showNotification('Please fill in all required fields', 'error');
+  }
+  
+  return isValid;
+}
+
+function updateOrderSummary() {
+  const summary = document.getElementById('orderSummary');
+  const department = document.getElementById('department').value;
+  const eventName = document.getElementById('eventName').value;
+  const eventDate = document.getElementById('eventDate').value;
+  const eventTime = document.getElementById('eventTime').value;
+  const numberOfPersons = document.getElementById('numberOfPersons').value;
+  const itemsRequired = document.getElementById('itemsRequired').value;
+  const remarks = document.getElementById('remarks').value;
+  
+  summary.innerHTML = `
+    <div class="row g-3">
+      <div class="col-md-6"><strong>Department:</strong> ${department}</div>
+      <div class="col-md-6"><strong>Event:</strong> ${eventName}</div>
+      <div class="col-md-6"><strong>Date:</strong> ${eventDate ? new Date(eventDate).toLocaleDateString() : 'Not specified'}</div>
+      <div class="col-md-6"><strong>Time:</strong> ${eventTime || 'Not specified'}</div>
+      <div class="col-md-6"><strong>Persons:</strong> ${numberOfPersons}</div>
+      <div class="col-12"><strong>Items Required:</strong> ${itemsRequired}</div>
+      ${remarks ? `<div class="col-12"><strong>Special Instructions:</strong> ${remarks}</div>` : ''}
+    </div>
+  `;
+}
+
+// View order details function
+function viewOrderDetails(orderId) {
+  // This could open a modal with order details
+  window.modernCanteenApp?.showNotification(`Order #${orderId} details - Feature coming soon!`, 'info');
+}
+
+
+// Enhanced checkbox handling
+document.addEventListener('DOMContentLoaded', function() {
+  // Handle checkbox label clicks
+  const checkboxContainers = document.querySelectorAll('.form-check-modern');
+  checkboxContainers.forEach(container => {
+    const checkbox = container.querySelector('input[type="checkbox"]');
+    const label = container.querySelector('label');
+    
+    if (checkbox && label) {
+      // Handle clicks on the label
+      label.addEventListener('click', function(e) {
+        e.preventDefault();
+        checkbox.checked = !checkbox.checked;
+        checkbox.dispatchEvent(new Event('change', { bubbles: true }));
+      });
+      
+      // Handle clicks on the container
+      container.addEventListener('click', function(e) {
+        if (e.target !== checkbox && e.target !== label) {
+          checkbox.checked = !checkbox.checked;
+          checkbox.dispatchEvent(new Event('change', { bubbles: true }));
+        }
+      });
+    }
+  });
+});
+
+// Form submission handling
+document.getElementById('orderForm')?.addEventListener('submit', function(e) {
+  e.preventDefault();
+  
+  const confirmCheckbox = document.getElementById('confirmOrder');
+  if (!confirmCheckbox.checked) {
+    window.modernCanteenApp?.showNotification('Please confirm the order details before submitting', 'warning');
+    return;
+  }
+  
+  const submitBtn = document.getElementById('submitBtn');
+  submitBtn.classList.add('loading');
+  submitBtn.disabled = true;
+  
+  setTimeout(() => {
+    this.submit();
+  }, 1000);
+});
+
+// Set minimum date to today
+document.addEventListener('DOMContentLoaded', function() {
+  const eventDateField = document.getElementById('eventDate');
+  if (eventDateField) {
+    const today = new Date().toISOString().split('T')[0];
+    eventDateField.min = today;
+  }
+  
+  // Initialize first step
+  updateProgressSteps(1);
+});
+</script>
+
+<style>
+.step-indicator {
+  width: 30px;
+  height: 30px;
+  background: var(--border-color);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 600;
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+}
+
+.step-indicator.completed {
+  background: var(--accent-color);
+  color: white;
+}
+
+.form-step {
+  min-height: 400px;
+}
+
+.btn-outline-secondary {
+  border-color: var(--border-color);
+  color: var(--text-secondary);
+}
+
+.btn-outline-secondary:hover {
+  background: var(--secondary-color);
+  border-color: var(--primary-color);
+  color: var(--primary-color);
+}
+</style>
+{% endblock %}

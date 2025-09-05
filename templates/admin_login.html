@@ -1,0 +1,162 @@
+{% extends 'layout.html' %}
+{% block content %}
+
+<!-- Back Navigation -->
+<div class="row mb-3">
+  <div class="col-12">
+    <a href="{{ url_for('home') }}" class="btn-modern btn-outline-secondary btn-sm">
+      <i class="fas fa-arrow-left me-2"></i>
+      Back to Login Selection
+    </a>
+  </div>
+</div>
+
+<div class="row justify-content-center">
+  <div class="col-md-6 col-lg-5">
+    <div class="glass-card form-modern animate-fadeIn">
+      <div class="text-center mb-4">
+        <div class="bg-danger rounded-circle d-inline-flex align-items-center justify-content-center mb-3" 
+             style="width: 60px; height: 60px;">
+          <i class="fas fa-user-shield text-white" style="font-size: 1.5rem;"></i>
+        </div>
+        <h4 class="text-gradient mb-2">Admin Login</h4>
+        <p class="text-muted mb-0">Administrative access to manage orders</p>
+      </div>
+      
+      <form method="post" id="adminLoginForm" class="needs-validation" novalidate>
+        <div class="form-group-modern">
+          <label class="form-label-modern">
+            <i class="fas fa-user-shield"></i>
+            Admin Username
+          </label>
+          <input class="form-control-modern" 
+                 name="username" 
+                 id="username"
+                 type="text" 
+                 required 
+                 autocomplete="username"
+                 placeholder="Enter admin username">
+          <div class="invalid-feedback">Please enter your admin username</div>
+        </div>
+        
+        <div class="form-group-modern">
+          <label class="form-label-modern">
+            <i class="fas fa-lock"></i>
+            Password
+          </label>
+          <div class="position-relative">
+            <input class="form-control-modern" 
+                   name="password" 
+                   id="password"
+                   type="password" 
+                   required 
+                   autocomplete="current-password"
+                   placeholder="Enter admin password">
+            <button type="button" class="btn position-absolute" 
+                    style="right: 10px; top: 50%; transform: translateY(-50%); border: none; background: none; color: var(--text-secondary);" 
+                    onclick="togglePassword()" 
+                    data-tooltip="Show/hide password">
+              <i class="fas fa-eye" id="passwordToggleIcon"></i>
+            </button>
+          </div>
+          <div class="invalid-feedback">Please enter your admin password</div>
+        </div>
+        
+        <div class="form-group-modern">
+          <div class="alert alert-warning" style="background: rgba(245, 158, 11, 0.1); border: 1px solid rgba(245, 158, 11, 0.2); color: #d97706; border-radius: 8px;">
+            <small>
+              <i class="fas fa-exclamation-triangle me-2"></i>
+              Admin access provides full system control
+            </small>
+          </div>
+        </div>
+        
+        <div class="form-group-modern">
+          <button type="submit" class="btn-modern w-100" id="loginBtn" 
+                  style="background: linear-gradient(135deg, #ef4444, #dc2626); color: white;">
+            <i class="fas fa-shield-alt me-2"></i>
+            Sign In as Admin
+          </button>
+        </div>
+      </form>
+      
+      <div class="text-center mt-4">
+        <small class="text-muted">
+          Having trouble signing in? 
+          <a href="{{ url_for('change_password_login') }}" class="text-primary text-decoration-none">
+            Reset Password
+          </a>
+        </small>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<script>
+function togglePassword() {
+  const passwordField = document.getElementById('password');
+  const toggleIcon = document.getElementById('passwordToggleIcon');
+  
+  if (passwordField.type === 'password') {
+    passwordField.type = 'text';
+    toggleIcon.className = 'fas fa-eye-slash';
+  } else {
+    passwordField.type = 'password';
+    toggleIcon.className = 'fas fa-eye';
+  }
+}
+
+// Enhanced form validation and submission
+document.getElementById('adminLoginForm')?.addEventListener('submit', function(e) {
+  e.preventDefault();
+  
+  const form = this;
+  const username = document.getElementById('username');
+  const password = document.getElementById('password');
+  const loginBtn = document.getElementById('loginBtn');
+  
+  // Reset validation states
+  [username, password].forEach(field => {
+    field.classList.remove('is-valid', 'is-invalid');
+  });
+  
+  let isValid = true;
+  
+  // Validate username
+  if (!username.value.trim()) {
+    username.classList.add('is-invalid');
+    isValid = false;
+  } else {
+    username.classList.add('is-valid');
+  }
+  
+  // Validate password
+  if (!password.value.trim()) {
+    password.classList.add('is-invalid');
+    isValid = false;
+  } else {
+    password.classList.add('is-valid');
+  }
+  
+  if (!isValid) {
+    window.modernCanteenApp?.showNotification('Please fill in all required fields', 'error');
+    return;
+  }
+  
+  // Show loading state
+  loginBtn.classList.add('loading');
+  loginBtn.disabled = true;
+  
+  // Simulate processing delay
+  setTimeout(() => {
+    form.submit();
+  }, 800);
+});
+
+// Auto-focus username field
+document.addEventListener('DOMContentLoaded', function() {
+  document.getElementById('username')?.focus();
+});
+</script>
+{% endblock %}
