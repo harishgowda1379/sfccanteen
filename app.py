@@ -1124,7 +1124,7 @@ def order():
             save_json(ORDERS_FILE, orders)
 
             # === 📧 Send Email Notification to Admin ===
-            DOMAIN = get_ngrok_url() or "http://localhost:5000"
+            DOMAIN = "https://sfccanteen.onrender.com"
             approve_link = f"{DOMAIN}{url_for('approve_order', order_id=new_id)}?token=secure123"
             reject_link = f"{DOMAIN}{url_for('reject_order', order_id=new_id)}?token=secure123"
 
@@ -1617,4 +1617,5 @@ def reset_department_password(department_id):
 
 
 if __name__ == '__main__':
-    app.run(debug=True, host='127.0.0.1', port=5000)
+    port = int(os.environ.get('PORT', 5000))  # Use Render's PORT if available
+    app.run(debug=True, host='0.0.0.0', port=port)
