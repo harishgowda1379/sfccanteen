@@ -13,19 +13,5 @@
     "department_name": "bca",
     "created_at": "2025-09-03 16:01:33",
     "created_by": "admin"
-  },
-  "bcom": {
-    "password": "bcom123",
-    "role": "faculty",
-    "department_name": "bcom",
-    "created_at": "2025-09-03 16:04:39",
-    "created_by": "admin"
-  },
-  "bba": {
-    "password": "bba123",
-    "role": "faculty",
-    "department_name": "bba",
-    "created_at": "2025-09-05 14:27:06",
-    "created_by": "admin"
   }
 }
