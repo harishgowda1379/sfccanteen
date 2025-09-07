@@ -116,6 +116,45 @@ body {
     background: linear-gradient(135deg, var(--warning-color), #d97706);
     color: white;
 }
+/* Brand Logo */
+.brand-logo {
+  height: 60px;       /* default mobile size */
+  width: auto;
+  margin-right: 10px;
+  transition: all 0.3s ease-in-out;
+}
+
+.brand-title {
+  font-family: 'Inter', sans-serif;
+  font-size: 20px;
+  font-weight: 700;
+  color: white;
+  letter-spacing: 1px;
+  line-height: 1.2;
+  text-transform: uppercase;
+  transition: all 0.3s ease-in-out;
+}
+
+/* Tablet/Desktop */
+@media (min-width: 768px) {
+  .brand-logo {
+    height: 80px;   /* bigger on tablets */
+  }
+  .brand-title {
+    font-size: 26px;
+  }
+}
+
+/* Large desktop */
+@media (min-width: 1200px) {
+  .brand-logo {
+    height: 100px;
+  }
+  .brand-title {
+    font-size: 32px;
+  }
+}
+
 
 /* Form styles */
 .form-modern {
