@@ -35,19 +35,7 @@
     padding: 0 2rem;
 }
 
-/* Logo in Navbar */
-.navbar-brand-modern img {
-    height: px; /* adjust as needed */
-    margin-right: 10px;
-}
 
-/* Adjust CanteenHub text */
-.navbar-brand-modern span {
-    font-size: 4rem;
-    align-items: left;
-    font-weight: 1000;
-    color: #333; /* dark text */
-}
 
 /* Push page content below fixed navbar */
 body {
@@ -116,9 +104,9 @@ body {
     background: linear-gradient(135deg, var(--warning-color), #d97706);
     color: white;
 }
-/* Brand Logo */
+/* Logo inside Navbar */
 .brand-logo {
-  height: 60px;       /* default mobile size */
+  height: 60px;   /* default mobile size */
   width: auto;
   margin-right: 10px;
   transition: all 0.3s ease-in-out;
@@ -127,33 +115,25 @@ body {
 .brand-title {
   font-family: 'Inter', sans-serif;
   font-size: 20px;
-  font-weight: 700;
-  color: white;
+  font-weight: 800;
+  color: #333;        /* Dark so it shows on white background */
   letter-spacing: 1px;
   line-height: 1.2;
   text-transform: uppercase;
-  transition: all 0.3s ease-in-out;
 }
 
 /* Tablet/Desktop */
 @media (min-width: 768px) {
-  .brand-logo {
-    height: 80px;   /* bigger on tablets */
-  }
-  .brand-title {
-    font-size: 26px;
-  }
+  .brand-logo { height: 80px; }
+  .brand-title { font-size: 28px; }
 }
 
 /* Large desktop */
 @media (min-width: 1200px) {
-  .brand-logo {
-    height: 100px;
-  }
-  .brand-title {
-    font-size: 32px;
-  }
+  .brand-logo { height: 100px; }
+  .brand-title { font-size: 34px; }
 }
+
 
 
 /* Form styles */
