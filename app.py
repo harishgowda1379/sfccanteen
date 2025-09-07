@@ -1012,19 +1012,6 @@ def home():
     return render_template('login_select.html')
 import requests
 
-def get_ngrok_url():
-    """Fetch the current public URL from ngrok's local API"""
-    try:
-        response = requests.get("http://127.0.0.1:4040/api/tunnels")
-        tunnels = response.json().get("tunnels", [])
-        for tunnel in tunnels:
-            if tunnel.get("proto") == "https":
-                return tunnel.get("public_url")
-    except Exception as e:
-        print("Could not fetch ngrok URL:", e)
-    return None
-
-
 
 @app.route('/faculty_login', methods=['GET', 'POST'])
 def faculty_login():
@@ -1619,3 +1606,4 @@ def reset_department_password(department_id):
 if __name__ == '__main__':
     port = int(os.environ.get('PORT', 5000))  # Use Render's PORT if available
     app.run(debug=True, host='0.0.0.0', port=port)
+ṣ
