@@ -1156,18 +1156,8 @@ def order():
 def admin_dashboard():
     if session.get('role') != 'admin':
         return redirect(url_for('home'))
-    
     orders = load_json(ORDERS_FILE)
-    pending_orders = [o for o in orders if o.get('status') == 'pending']
-    approved_orders = [o for o in orders if o.get('status') == 'approved']
-    rejected_orders = [o for o in orders if o.get('status') == 'rejected']
-
-    return render_template(
-        'admin_dashboard.html',
-        pending_orders=pending_orders,
-        approved_orders=approved_orders,
-        rejected_orders=rejected_orders
-    )
+    return render_template('admin_dashboard.html', orders=orders)
 
 
 @app.route('/approve_order/<int:order_id>')
