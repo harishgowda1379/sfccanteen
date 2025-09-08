@@ -33,8 +33,8 @@ from email.mime.text import MIMEText
 from flask import url_for
 
 # Your Gmail
-EMAIL_ADDRESS = "harishgowda1379@gmail.com"
-EMAIL_PASSWORD = "jewb jmhc igcq zjyv"  # not your Gmail password, use App Password
+EMAIL_ADDRESS = "st.francis.college.help@gmail.com"
+EMAIL_PASSWORD = "gpoy ezwq zkzt cvoy"  # not your Gmail password, use App Password
 ADMIN_EMAIL = "kannadagamer387@gmail.com"
 
 def send_email(subject, recipient, body):
