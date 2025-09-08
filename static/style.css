@@ -130,11 +130,9 @@ body {
 .brand-logo {
   height: 60px;
   width: 60px;
-  border-radius: 100%;       /* Makes it circular */
-  object-fit: cover;        /* Keeps aspect ratio inside circle */
   margin-right: 12px;
   transition: all 0.3s ease-in-out;
-  border: 3px solid var(--primary-color); /* Optional: stylish border */
+  
 }
 
 .brand-title {
