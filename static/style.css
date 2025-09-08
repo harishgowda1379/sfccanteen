@@ -67,7 +67,7 @@ body {
 
 /* Body and base styles */
 body {
-    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    font-family: 'Poppins', -apple-system, BlinkMacSystemFont, sans-serif;
     background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
     min-height: 100vh;
     color: var(--text-color);
@@ -128,21 +128,36 @@ body {
 }
 /* Logo inside Navbar */
 .brand-logo {
-  height: 60px;   /* default mobile size */
-  width: auto;
-  margin-right: 10px;
+  height: 60px;
+  width: 60px;
+  border-radius: 50%;       /* Makes it circular */
+  object-fit: cover;        /* Keeps aspect ratio inside circle */
+  margin-right: 12px;
   transition: all 0.3s ease-in-out;
+  border: 3px solid var(--primary-color); /* Optional: stylish border */
 }
 
 .brand-title {
-  font-family: 'Inter', sans-serif;
-  font-size: 20px;
-  font-weight: 800;
-  color: #333;        /* Dark so it shows on white background */
-  letter-spacing: 1px;
-  line-height: 1.2;
+  font-family: 'Poppins', sans-serif;
+  font-size: 22px;
+  font-weight: 700;
   text-transform: uppercase;
+  letter-spacing: 1px;
+  background: linear-gradient(135deg, #6366f1, #10b981); /* Indigo → Green */
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  color: transparent; /* Fallback */
+  transition: all 0.3s ease-in-out;
 }
+.brand-title:hover {
+  background: linear-gradient(135deg, #8b5cf6, #06b6d4); /* Purple → Cyan */
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  transform: scale(1.05);
+}
+
+
 
 /* Tablet/Desktop */
 @media (min-width: 768px) {
