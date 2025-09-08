@@ -29,7 +29,7 @@
     height: 100px; /* default height */
     display: flex;
     align-items: center;
-    background-color: #ffffff00;
+    background-color: #fffffff1;
     box-shadow: 0 2px 8px rgba(0,0,0,0.1);
     z-index: 9999;
     padding: 0 2rem;
@@ -68,7 +68,7 @@ body {
 /* Body and base styles */
 body {
     font-family: 'Poppins', -apple-system, BlinkMacSystemFont, sans-serif;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background: linear-gradient(135deg, #0725a7 0%, #c00e85 100%);
     min-height: 100vh;
     color: var(--text-color);
 }
@@ -130,7 +130,7 @@ body {
 .brand-logo {
   height: 60px;
   width: 60px;
-  border-radius: 50%;       /* Makes it circular */
+  border-radius: 100%;       /* Makes it circular */
   object-fit: cover;        /* Keeps aspect ratio inside circle */
   margin-right: 12px;
   transition: all 0.3s ease-in-out;
@@ -143,7 +143,7 @@ body {
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 1px;
-  background: linear-gradient(135deg, #6366f1, #10b981); /* Indigo → Green */
+  background: linear-gradient(135deg, #0f12d8, #840473); /* Indigo → Green */
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
